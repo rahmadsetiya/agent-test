@@ -18,7 +18,3 @@ class GreetTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-class IntentionalFailureTest(unittest.TestCase):
-    def test_ci_detects_failure(self):
-        self.assertEqual(1, 2)
