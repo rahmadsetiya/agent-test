@@ -1,0 +1,6 @@
+services:
+  app:
+    build:
+      context: .
+    command: ["sleep", "infinity"]
+    restart: unless-stopped
