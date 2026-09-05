@@ -1,0 +1,11 @@
+[Unit]
+Description=Run the agent-test project backup daily
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=15m
+Unit=agent-test-backup.service
+
+[Install]
+WantedBy=timers.target

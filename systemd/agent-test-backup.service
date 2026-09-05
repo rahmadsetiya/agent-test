@@ -1,0 +1,9 @@
+[Unit]
+Description=Back up the agent-test project
+ConditionFileIsExecutable=%h/projects/agent-test/scripts/backup.sh
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/projects/agent-test
+ExecStart=/usr/bin/bash %h/projects/agent-test/scripts/backup.sh
+UMask=0077
