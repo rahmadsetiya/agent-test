@@ -119,3 +119,68 @@ touch "$retention_test_dir"/agent-test-20000101T00000{0,1,2}Z.tar.gz
 BACKUP_DIR="$retention_test_dir" BACKUP_RETENTION_COUNT=2 ./scripts/backup.sh
 find "$retention_test_dir" -maxdepth 1 -type f -name 'agent-test-*.tar.gz' -print | sort
 ```
+
+## Automated backups with systemd
+
+The repository includes a user-level systemd service and timer. The units
+expect the checkout at `$HOME/projects/agent-test` and run the existing backup
+script as the logged-in user, never as root.
+
+Link the units into the user manager and reload it:
+
+```bash
+test "$PWD" = "$HOME/projects/agent-test"
+systemctl --user link "$PWD/systemd/agent-test-backup.service"
+systemctl --user link "$PWD/systemd/agent-test-backup.timer"
+systemctl --user daemon-reload
+```
+
+Enable and start the daily timer:
+
+```bash
+systemctl --user enable --now agent-test-backup.timer
+```
+
+For the user manager to keep running after logout, check lingering and ask the
+VPS administrator to enable it for your non-root account if needed:
+
+```bash
+loginctl show-user "$USER" --property=Linger
+```
+
+Check timer and service status, including the next scheduled run:
+
+```bash
+systemctl --user list-timers agent-test-backup.timer --all
+systemctl --user status agent-test-backup.timer
+systemctl --user status agent-test-backup.service
+```
+
+Trigger a backup manually and verify the newest archive:
+
+```bash
+systemctl --user start agent-test-backup.service
+archive="$(ls -1t ../agent-test-backups/agent-test-*.tar.gz | head -n 1)"
+tar -tzf "$archive"
+```
+
+View service logs:
+
+```bash
+journalctl --user -u agent-test-backup.service
+journalctl --user -u agent-test-backup.service -f
+```
+
+After updating either unit in the repository, reload the user manager:
+
+```bash
+systemctl --user daemon-reload
+systemctl --user restart agent-test-backup.timer
+```
+
+Disable and stop automated backups without deleting existing archives:
+
+```bash
+systemctl --user disable --now agent-test-backup.timer
+systemctl --user daemon-reload
+```

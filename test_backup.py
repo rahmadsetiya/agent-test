@@ -20,8 +20,11 @@ BACKUP_FILES = {
     "compose.yml",
     "hello.py",
     "scripts/backup.sh",
+    "systemd/agent-test-backup.service",
+    "systemd/agent-test-backup.timer",
     "test_backup.py",
     "test_hello.py",
+    "test_systemd.py",
 }
 
 
