@@ -34,10 +34,24 @@ Check staging status:
 docker compose -f compose.staging.yml ps
 ```
 
+The `app` service should report `healthy` after its startup healthcheck passes.
+
 View staging logs:
 
 ```bash
 docker compose -f compose.staging.yml logs -f
+```
+
+Run the healthcheck probe manually:
+
+```bash
+docker compose -f compose.staging.yml exec app python hello.py Healthcheck
+```
+
+Inspect Docker's health status and healthcheck history:
+
+```bash
+docker inspect --format '{{json .State.Health}}' "$(docker compose -f compose.staging.yml ps -q app)"
 ```
 
 Run the app inside staging:
